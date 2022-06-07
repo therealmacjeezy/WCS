@@ -16,15 +16,15 @@ A quicker way to install Xcode on macOS systems via Jamf Pro.
 
 ----
 ## Setup
-  1. Create a new policy to **cache** Xcode with a custom trigger
-   - This will allow you to cache Xcode ahead of time to help speed up the install process.
-  1. Add script to Jamf Pro Server and customize the following variables:
+  1. Create a new policy to **cache** Xcode with a custom trigger *(This will allow you to cache Xcode ahead of time to help speed up the install process.)*
+  1. Add script to Jamf Pro Server and customize the variables in the table listed below
+  1. Enter the Version of Xcode you are deploying *(Example: 13.4)* in Script Parameter #4
+  1. Enter the custom trigger for the **cache** Xcode Policy in Script Parameter #5
+
    **Variable Name** | **Line Number** | **Usage**
    ----------------- | --------------- | ---------
    `XCODE_XIP_PATH` | 11 | Location to UNXIP Xcode to
    `UNXIP` | 12 | Location of `unxip` install
-  1. Enter the Version of Xcode you are deploying *(Example: 13.4)* in Script Parameter #4
-  1. Enter the custom trigger for the **cache** Xcode Policy in Script Parameter #5
 
 > Be sure to set the trigger and scope correctly. This will vary based on how you want to deploy it. 
    

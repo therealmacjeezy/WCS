@@ -11,6 +11,7 @@ XCODE_NAME="Xcode_${XCODE_VERSION}"
 XCODE_XIP_CACHE="/Library/Application Support/JAMF/Waiting Room/${XCODE_NAME}.xip.pkg"
 XCODE_XIP_PATH="/Library/Mooncheese/${XCODE_NAME}.xip"
 UNXIP="/Library/Mooncheese/Tools/unxip"
+UTILITYDIR="/Library/Mooncheese"
 
 LOG_FOLDER="/private/var/log"
 LOG_NAME="InstallXcode.log"
@@ -110,10 +111,10 @@ fi
 dialog_update "listitem: index: $((DIALOG_STEP)), status: wait"
 
 echo_logger "Expanding ${XCODE_XIP_PATH}"
-if [[ ! -e "/Library/Mooncheese" ]]; then
-    mkdir -p "/Library/Mooncheese"
+if [[ ! -e "$UTILITYDIR" ]]; then
+    mkdir -p "$UTILITYDIR"
 fi
-$UNXIP "${XCODE_XIP_PATH}" "/Library/Mooncheese"
+$UNXIP "${XCODE_XIP_PATH}" "$UTILITYDIR"
 
 echo_logger "Removing ${XCODE_XIP_PATH}"
 rm "${XCODE_XIP_PATH}"
@@ -126,7 +127,7 @@ dialog_update "listitem: index: $((DIALOG_STEP++)), status: success"
 dialog_update "listitem: index: $((DIALOG_STEP)), status: wait"
 
 echo_logger "Moving Xcode into Applications..."
-mv "/Library/Mooncheese/Xcode.app" "/Applications/${XCODE_NAME}.app"
+mv "$UTILITYDIR/Xcode.app" "/Applications/${XCODE_NAME}.app"
 
 # echo_logger "Removing Quarantine Attribute.."
 # xattr -rd com.apple.quarantine "/Applications/${XCODE_NAME}.app"
@@ -160,8 +161,8 @@ for PKG in $(/bin/ls /Applications/"${XCODE_NAME}".app/Contents/Resources/Packag
     /usr/sbin/installer -pkg "$PKG" -target /
 done
 
-echo_logger "Removing Quarantine Attribute.."
-xattr -rd com.apple.quarantine "/Applications/${XCODE_NAME}.app"
+# echo_logger "Removing Quarantine Attribute.."
+# xattr -rd com.apple.quarantine "/Applications/${XCODE_NAME}.app"
 
 dialog_update "listitem: index: $((DIALOG_STEP++)), status: success"
 sleep 2

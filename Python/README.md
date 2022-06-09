@@ -1,6 +1,6 @@
 # installPythonPackages.py
 
-An easy way to install python3 packages on macOS systems via Jamf Pro.
+An easy way to install python3 packages as the current logged in user on macOS systems via Jamf Pro.
 
 ----
 ## Requirements

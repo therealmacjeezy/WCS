@@ -1,4 +1,4 @@
-# Walmart Custom Scripts
+# WCS
 
 ### Script List
  - **Xcode**

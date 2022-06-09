@@ -23,8 +23,9 @@ A quicker way to install Xcode on macOS systems via Jamf Pro.
 
    **Variable Name** | **Line Number** | **Usage**
    ----------------- | --------------- | ---------
-   `XCODE_XIP_PATH` | 11 | Location to UNXIP Xcode to
-   `UNXIP` | 12 | Location of `unxip` install
+   `XCODE_XIP_PATH` | 12 | Location to UNXIP Xcode to
+   `UNXIP` | 13 | Location of `unxip` install
+   `UTILITYDIR` | 14 | Location of the directory you put resource files in.
 
 > Be sure to set the trigger and scope correctly. This will vary based on how you want to deploy it. 
    

@@ -159,6 +159,9 @@ homebrew_check () {
         su -l "$currentUser" -c "$homebrewPath update" 2>&1 | tee -a "$homebrewLog"
         # update_dialog "listitem: title: \"Updating Homebrew\", status: success"
     fi
+
+    ### Tap brew tap saucelabs/saucectl
+    su -l "$currentUser" -c "$homebrewPath tap saucelabs/saucectl" 2>&1 | tee -a "$homebrewLog"
 }
 
 install_packages () {

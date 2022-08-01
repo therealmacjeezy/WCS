@@ -30,8 +30,8 @@
 #   Last Modified: 07/28/2022
 #   Version: 0.1
 #
-#   Description: This script will create user accounts based on the users entered in script parameter
-#   number 4 (seperated by commas)
+#   Description: This script will create a user account based on the user entered in script parameter
+#   number 4 (seperated by commas) and the ssh key entered in script parameter #5
 #
 ####################################################################################################
 

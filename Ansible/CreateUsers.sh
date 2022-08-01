@@ -36,8 +36,10 @@
 ####################################################################################################
 
 ################# VARIABLES ######################
-## userAccounts: The list of users you want to create, seperated by commas **REQUIRED**
-userAccounts="$4"
+## userAccount: The user you want to create **REQUIRED**
+userAccount="$4"
+## sshKey: The ssh public key you want to add for the user **REQUIRED**
+sshKey="$5"
 ## currentUser: Grabs the username of the current logged in user **DO NOT CHANGE**
 currentUser=$(echo "show State:/Users/ConsoleUser" | scutil | awk '/Name :/ && ! /loginwindow/ { print $3 }')
 ## createUsersLog: Location of the CreateUsers script log **DO NOT CHANGE**
@@ -69,20 +71,26 @@ log_it () {
 
 macOSArch=$(/usr/bin/uname -m)
 
-create_users () {
-    for u in ${userList//,/ }; do
-        uidGen=$(awk 'BEGIN{srand();print int(rand()*(1500-1200))+505 }')
-        dscl . -create /Users/"$u"
-        dscl . -create /Users/"$u" UserShell /bin/bash
-        dscl . -create /Users/"$u" UniqueID $uidGen
-        dscl . -create /Users/"$u" PrimaryGroupID 80
-        dscl . -create /Users/"$u" NFSHomeDirectory /Users/"$u"
-        dscl . -append /Groups/admin GroupMembership "$u"
-        cp -R /System/Library/User\ Template/English.lproj /Users/"$u"
-        log_it "info" "Created $u user account"
-        echo "$u ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/"$u"
-        log_it "info" "Created sudoers.d file for $u"
-        /bin/cat > /Users/"$u"/.bash_profile <<'bash_profile'
+create_user () {
+    uidGen=$(awk 'BEGIN{srand();print int(rand()*(1500-1200))+505 }')
+
+    dscl . -create /Users/"$userName"
+    dscl . -create /Users/"$userName" UserShell /bin/bash
+    dscl . -create /Users/"$userName" UniqueID $userNameidGen
+    dscl . -create /Users/"$userName" PrimaryGroupID 80
+    dscl . -create /Users/"$userName" NFSHomeDirectory /Users/"$userName"
+    dscl . -append /Groups/admin GroupMembership "$userName"
+    cp -R /System/Library/User\ Template/English.lproj /Users/"$userName"
+    log_it "info" "Created user account for: $userName"
+
+    echo "$sshKey" > /Users/"$userName"/.ssh/authorized_keys
+    chmod 0644 /Users/"$userName"/.ssh/authorized_keys
+    log_it "info" "Created authorized_keys file for: $userName"
+    
+    echo "$userName ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/"$userName"
+    log_it "info" "Created sudoers.d file for: $userName"
+    
+    /bin/cat > /Users/"$userName"/.bash_profile <<'bash_profile'
 # Get the aliases and functions
 if [ -f ~/.bashrc ]; then
         . ~/.bashrc
@@ -90,11 +98,12 @@ fi
 
 # User specific environment and startup programs
 bash_profile
-        log_it "info" "Created bash_profile for user $u"
 
-        if [[ "$macOSArch" == "x86_64" ]]; then
-            log_it "System Architecture: Intel (64-Bit)"
-            /bin/cat > /Users/"$u"/.bashrc << 'bashrc'
+    log_it "info" "Created bash_profile for: $userName"
+
+    if [[ "$macOSArch" == "x86_64" ]]; then
+        log_it "System Architecture: Intel (64-Bit)"
+        /bin/cat > /Users/"$userName"/.bashrc << 'bashrc'
 export NVM_DIR="$/usr/local/bin/.nvm"
 
 # support for UTF-8 encoding
@@ -108,9 +117,9 @@ export PATH=/usr/local/bin:$PATH
 alias python=/usr/local/bin/python3
 alias pip=/usr/local/bin/pip3
 bashrc
-        elif [[ "$macOSArch" == "arm64" ]]; then
-            log_it "System Architecture: Apple Silicon 64-Bit"
-            /bin/cat > /Users/"$u"/.bashrc << 'bashrcApple'
+    elif [[ "$macOSArch" == "arm64" ]]; then
+        log_it "System Architecture: Apple Silicon 64-Bit"
+        /bin/cat > /Users/"$userName"/.bashrc << 'bashrcApple'
 export NVM_DIR="$/usr/local/bin/.nvm"
 
 # support for UTF-8 encoding
@@ -124,17 +133,20 @@ export PATH=/opt/homebrew/bin:/usr/local/bin:$PATH
 alias python=/opt/homebrew/bin/python3
 alias pip=/opt/homebrew/bin/pip3
 bashrcApple
-        fi
-        log_it "info" "Created .bashrc for $u"
-
-    done
+    fi
+    log_it "info" "Created .bashrc for: $userName"
 }
 
 
 if [[ ! -z "$4" ]]; then
-    userList="$4"
-    create_users
+    userName="$4"
+    if [[ ! -z "$5" ]]; then
+        sshKey="$5"
+        create_user
+    else
+        log_it "error" "Missing public ssh key for $userName (Script Parameter #5)"
+    fi
 else
-    log_it "error" "Missing list of users to create (Script Parameter #4)"
+    log_it "error" "Missing username of user to create (Script Parameter #4)"
     exit 1
 fi
